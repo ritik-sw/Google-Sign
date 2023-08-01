@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Google Sign-In Example</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        // Variable to store the Google Auth instance
+        var auth2;
+
+        function handleCredentialResponse(response) {
+            var responsePayload = response.credential;
+            var profile = response.clientId;
+
+            // Display the Google token and logged-in user's name on the screen
+            document.getElementById("token").textContent = "Google Token: " + responsePayload;
+            document.getElementById("name").textContent = "Logged-in user: " + profile;
+
+            // Enable the sign-out button
+            document.getElementById("signout").disabled = false;
+        }
+
+        function handleSignOut() {
+            auth2.signOut().then(function () {
+                // Clear the displayed token and name
+                document.getElementById("token").textContent = "";
+                document.getElementById("name").textContent = "";
+
+                // Disable the sign-out button
+                document.getElementById("signout").disabled = true;
+            });
+        }
+
+        function initializeGoogleSignIn() {
+            gapi.load('auth2', function () {
+                gapi.auth2.init({
+                    client_id: '375592478230-d3vhh8ck3nid6d2ubr8vj61g38sve4i4.apps.googleusercontent.com'
+                }).then(function () {
+                    auth2 = gapi.auth2.getAuthInstance();
+
+                    // Check if a user is already signed in
+                    if (auth2.isSignedIn.get()) {
+                        var user = auth2.currentUser.get();
+                        handleCredentialResponse(user);
+                    }
+                });
+            });
+        }
+
+        // Run the initialization function when the page is loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            initializeGoogleSignIn();
+        });
+    </script>
+</head>
+
+<body>
+    <div id="g_id_onload"
+        data-client_id="375592478230-d3vhh8ck3nid6d2ubr8vj61g38sve4i4.apps.googleusercontent.comm"
+        data-callback="handleCredentialResponse">
+    </div>
+
+    <div class="g_id_signin"
+        data-type="standard"
+        data-size="large"
+        data-theme="outline"
+        data-text="sign_in_with"
+        data-shape="rectangular"
+        data-logo_alignment="left">
+    </div>
+
+    <div>
+        <p id="token"></p>
+        <p id="name"></p>
+    </div>
+
+    <button id="signout" onclick="handleSignOut()" disabled>Sign Out</button>
+</body>
+
+</html>
